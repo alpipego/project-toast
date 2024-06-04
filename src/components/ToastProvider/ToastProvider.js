@@ -1,9 +1,15 @@
 import React from 'react'
 
+import useEscapeKey from '../../hooks/use-escape-key'
+
 export const ToastContext = React.createContext()
 
 function ToastProvider ({ children }) {
   const [toasts, setToasts] = React.useState([])
+  const escapeCallback = React.useCallback(() => {
+    setToasts([])
+  }, [])
+  useEscapeKey(escapeCallback)
 
   function addToastToStack({variant, message}) {
     const newToasts = [...toasts, { id: crypto.randomUUID(), variant, message }];
@@ -15,16 +21,11 @@ function ToastProvider ({ children }) {
     setToasts(newToasts);
   }
 
-  function clearToasts() {
-    setToasts([])
-  }
-
   return (
     <ToastContext.Provider value={{
       toasts,
       addToastToStack,
       removeToastFromStack,
-      clearToasts,
     }}>
       {children}
     </ToastContext.Provider>
